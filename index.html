@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kerala UG Index Calculator v3.3 - MES Kalladi Predictor</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manjari:wght=400;700&display=swap');
+        
+        /* ഹെഡിംഗുകൾ ഉൾപ്പെടെ സൈറ്റിലെ എല്ലാ ടെക്സ്റ്റും മഞ്ചേരി ഫോണ്ടിലേക്ക് മാറ്റാൻ */
+        * { font-family: 'Manjari', sans-serif; }
+        h1, h2, h3, .headline { font-family: 'Manjari', sans-serif; font-weight: 700; }
+        
+        body { 
+            transition: all 0.3s ease; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        @media print {
+            body { background: white !important; color: black !important; padding: 0; }
+            #mainCard { border: none !important; box-shadow: none !important; max-width: 100% !important; background: white !important; }
+            .no-print { display: none !important; }
+            #results { display: block !important; }
+            .bg-gradient-to-r { background: #4f46e5 !important; color: white !important; }
+            .border-2 { border-width: 1px !important; }
+        }
+        
+        .chance-high { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .chance-medium { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .chance-low { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+    </style>
+</head>
+<body id="bodyTag" class="py-6 px-4">
+
+    <div class="max-w-2xl mx-auto">
+        
+        <div class="flex justify-between items-center mb-6 px-2 no-print">
+            <div class="text-white text-center flex-1">
+                <h1 class="text-3xl font-bold">കേരള UG ഇൻഡക്സ്</h1>
+                <p class="text-sm opacity-90">MES കല്ലടി കോളേജ് പ്രിഡിക്ടർ </p>
+            </div>
+            <button onclick="toggleDarkMode()" id="themeBtn" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-xs font-bold backdrop-blur-sm transition cursor-pointer">
+                🌓 തീം മാറ്റുക
+            </button>
+        </div>
+
+        <div id="mainCard" class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/10 transition">
+            
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-7 text-white text-center">
+                <h2 class="text-2xl font-bold mb-1">നിങ്ങളുടെ ഇൻഡക്സ് കണക്കാക്കുക</h2>
+                <p class="text-xs opacity-90">പ്ലസ് ടു മാർക്കുകൾ നൽകിയാൽ കാലിക്കറ്റ്/എം.ജി യൂണിവേഴ്സിറ്റി കൃത്യത അനുസരിച്ച് ഫലം ലഭിക്കും</p>
+            </div>
+
+            <div class="p-6 space-y-6">
+                
+                <div class="no-print">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">യൂണിവേഴ്സിറ്റി തിരഞ്ഞെടുക്കുക</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="selectUni('calicut')" id="btnCalicut" class="py-3 px-4 rounded-xl font-bold text-sm transition border-2 border-indigo-200 text-indigo-700 bg-indigo-50 cursor-pointer">
+                            Calicut University
+                        </button>
+                        <button onclick="selectUni('mg')" id="btnMG" class="py-3 px-4 rounded-xl font-bold text-sm transition border-2 border-slate-200 text-slate-600 bg-white cursor-pointer">
+                            MG University
+                        </button>
+                    </div>
+                </div>
+
+                <div class="no-print">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">📚 പ്ലസ് ടു സ്ട്രീം</label>
+                    <select id="streamSelect" onchange="handleStreamChange()" class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-500 focus:outline-none font-semibold text-slate-700 transition bg-white">
+                        <option value="humanities">Humanities / Arts</option>
+                        <option value="commerce">Commerce</option>
+                        <option value="science">Science</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 no-print">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">ആകെ മാർക്ക് (Grand Total)</label>
+                        <input type="number" id="grandTotal" placeholder="1019" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:outline-none focus:border-indigo-500 font-semibold text-slate-800 bg-white">
+                        <p class="text-[11px] text-slate-400 mt-1">* 1200-ൽ ലഭിച്ച ആകെ മാർക്ക്</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">ഇംഗ്ലീഷ് മാർക്ക് (English Mark)</label>
+                        <input type="number" id="englishMark" placeholder="144" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:outline-none focus:border-indigo-500 font-semibold text-slate-800 bg-white">
+                        <p class="text-[11px] text-slate-400 mt-1">* 200-ൽ ലഭിച്ച മാർക്ക്</p>
+                    </div>
+                </div>
+
+                <div id="dynamicFields" class="space-y-4 no-print"></div>
+
+                <div id="adjustmentBox" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 no-print">
+                    <span class="block text-sm font-bold text-slate-800">✨ ബോണസ് / പെനാൽറ്റി അഡ്ജസ്റ്റ്മെന്റുകൾ</span>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="bonusCheck" class="w-5 h-5 text-indigo-600 rounded">
+                        <span class="text-sm text-slate-700 font-medium">NCC / NSS / SPC (ബോണസ് +15 മാർക്ക്)</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="checkbox" id="sayCheck" class="w-5 h-5 text-rose-600 rounded">
+                        <span class="text-sm text-slate-700 font-medium">SAY / രണ്ടാമത് ജയിച്ചവർ (പെനാൽറ്റി -10 മാർക്ക്)</span>
+                    </label>
+                </div>
+
+                <button onclick="calculateAllIndex()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg text-lg no-print cursor-pointer">
+                    🚀 ഇൻഡക്സ് കണക്കാക്കുക
+                </button>
+
+                <div id="results" class="hidden mt-6 pt-6 border-t-2 border-slate-200 space-y-6">
+                    
+                    <div id="printArea" class="bg-white p-2 rounded-xl">
+                        <h2 class="text-xl font-bold text-indigo-700 text-center mb-1 hidden show-print">MES KALLADI COLLEGE UG ADMISSION REPORT</h2>
+                        
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center">
+                                <span class="inline-block w-1 h-5 bg-indigo-600 mr-2 rounded"></span>
+                                നിങ്ങളുടെ ഇൻഡക്സ് സ്കോറുകൾ
+                            </h3>
+                            <div id="resultCards" class="space-y-2"></div>
+                        </div>
+
+                        <div id="cutoffPredictions" class="mt-6 pt-6 border-t-2 border-slate-100">
+                            <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center">
+                                <span class="inline-block w-1 h-5 bg-purple-600 mr-2 rounded"></span>
+                                MES KALLADI കോളേജ് സാധ്യത (Last Year Cutoff Based)
+                            </h3>
+                            <div id="predictionCards" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 no-print">
+                        <button onclick="downloadPDF()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer shadow">
+                            <span>📥 PDF ഡൗൺലോഡ്</span>
+                        </button>
+                        <button onclick="shareOnWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center space-x-2 cursor-pointer shadow">
+                            <span>📲 വാട്സാപ്പ് ഷെയർ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-6 text-white/80 text-xs no-print space-y-1">
+            <p>MES Kalladi College • UG Admission Index Calculator</p>
+            <p>നിങ്ങളുടെ പ്ലസ് ടു മാർക്കുകൾ എളുപ്പത്തിൽ കണക്കാക്കാൻ നിർമ്മിച്ചിരിക്കുന്നത്.</p>
+        </div>
+    </div>
+
+    <script>
+        const mesKallidiCutoffs = {
+            'humanities': [
+                { course: 'B.A. English Language & Literature', open: 1398, base: 1400 },
+                { course: 'B.A. Economics', open: 1095, base: 1200 },
+                { course: 'B.A. History', open: 1167, base: 1200 },
+                { course: 'BA Arabic & Islamic History', open: 1489, base: 1600 },
+                { course: 'B.A. Journalism & Mass Communication', open: 588, base: 1000 }
+            ],
+            'science': [
+                { course: 'B.Sc. Chemistry', open: 848, base: 800 },
+                { course: 'B.Sc. Physics', open: 846, base: 800 },
+                { course: 'B.Sc. Mathematics', open: 911, base: 800 },
+                { course: 'B.Sc. Botany', open: 894, base: 800 },
+                { course: 'B.Sc. Computer Science', open: 855, base: 1200 },
+                { course: 'Bachelor of Computer Application (BCA)', open: 908, base: 1200 },
+                { course: 'B.Sc. Food Technology', open: 727, base: 1000 }
+            ],
+            'commerce': [
+                { course: 'B.Com. Finance', open: 1207, base: 1200 },
+                { course: 'B.Com. Computer Application', open: 1101, base: 1200 },
+                { course: 'B.Com. Co-Operation', open: 1092, base: 1200 },
+                { course: 'BBA Finance (Aided)', open: 1117, base: 1200 },
+                { course: 'BBA Finance (Self-Financing)', open: 1021, base: 1200 }
+            ]
+        };
+
+        let selectedUni = 'calicut';
+        let isDarkMode = false;
+
+        function selectUni(uni) {
+            selectedUni = uni;
+            const isCalicut = uni === 'calicut';
+            
+            document.getElementById('btnCalicut').className = isCalicut ? "py-3 px-4 rounded-xl font-bold text-sm transition border-2 border-indigo-200 text-indigo-700 bg-indigo-50 cursor-pointer" : "py-3 px-4 rounded-xl font-bold text-sm transition border-2 border-slate-200 text-slate-600 bg-white cursor-pointer";
+            document.getElementById('btnMG').className = !isCalicut ? "py-3 px-4 rounded-xl font-bold text-sm transition border-2 border-indigo-200 text-indigo-700 bg-indigo-50 cursor-pointer" : "py-3 px-4 rounded-xl font-bold text-sm transition border-2 border-slate-200 text-slate-600 bg-white cursor-pointer";
+            
+            document.getElementById('results').classList.add('hidden');
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            const body = document.getElementById('bodyTag');
+            const mainCard = document.getElementById('mainCard');
+            const adjBox = document.getElementById('adjustmentBox');
+            const inputs = document.querySelectorAll('input, select');
+            
+            if(isDarkMode) {
+                body.style.background = '#1e293b';
+                mainCard.className = "bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-slate-700 transition text-white";
+                if(adjBox) adjBox.className = "bg-slate-700/50 p-4 rounded-xl border border-slate-600 space-y-3 text-white";
+                inputs.forEach(i => { 
+                    i.style.backgroundColor = "#334155"; 
+                    i.style.color = "#fff"; 
+                    i.style.borderColor = "#475569"; 
+                });
+            } else {
+                body.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                mainCard.className = "bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/10 transition";
+                if(adjBox) adjBox.className = "bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3";
+                inputs.forEach(i => { 
+                    i.style.backgroundColor = "#fff"; 
+                    i.style.color = "#1e293b"; 
+                    i.style.borderColor = "#cbd5e1"; 
+                });
+            }
+        }
+
+        function handleStreamChange() {
+            const stream = document.getElementById('streamSelect').value;
+            const container = document.getElementById('dynamicFields');
+            document.getElementById('results').classList.add('hidden');
+            
+            if (stream === 'humanities') {
+                container.innerHTML = `
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-1">📖 ആപ്ലിക്കേഷൻ വിഷയ മാർക്ക്</label>
+                        <input type="number" id="subjectMark" placeholder="176" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 focus:outline-none focus:border-indigo-500 font-semibold text-slate-800 bg-white">
+                        <p class="text-[11px] text-slate-400 mt-1">* നിങ്ങൾ അപ്ലൈ ചെയ്യുന്ന പ്രത്യേക വിഷയത്തിന്റെ മാർക്ക് (ഉദാഹരണത്തിന്: ജേണലിസം, സോഷ്യോളജി, ഹിസ്റ്ററി എന്നിവയ്ക്ക് 200-ൽ ലഭിച്ച മാർക്ക്)</p>
+                    </div>`;
+            } else if (stream === 'commerce') {
+                container.innerHTML = `
+                    <div class="bg-amber-50/80 p-4 rounded-xl border-2 border-amber-200 text-slate-800">
+                        <span class="block text-sm font-bold text-amber-900 mb-1">കൊമേഴ്സ് വെയിറ്റേജ് സെലക്ഷൻ</span>
+                        <p class="text-[11px] text-amber-700 mb-3">* പ്ലസ് ടുവിൽ നിങ്ങൾ പഠിച്ച വിഷയങ്ങൾ ടിക്ക് ചെയ്യുക (ഓരോന്നിനും +15 ബോണസ് ഇൻഡക്സ് മാർക്ക് ലഭിക്കും):</p>
+                        <div class="space-y-2 text-xs font-semibold">
+                            <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" id="comSub1" checked> <span>Accountancy</span></label>
+                            <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" id="comSub2" checked> <span>Business Studies</span></label>
+                            <label class="flex items-center space-x-2 cursor-pointer"><input type="checkbox" id="comSub3" checked> <span>Economics / Computer Applications</span></label>
+                        </div>
+                    </div>`;
+            } else if (stream === 'science') {
+                container.innerHTML = `
+                    <div class="bg-blue-50/60 p-4 rounded-xl border-2 border-blue-200 space-y-4 text-slate-800">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">📐 Part III ടോട്ടൽ മാർക്ക് (ഭാഷകൾ ഒഴിവാക്കി)</label>
+                            <input type="number" id="part3Total" placeholder="510" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold focus:outline-none">
+                            <p class="text-[11px] text-slate-500 mt-1">* ഫിസിക്സ്, കെമിസ്ട്രി, മാത്സ്, ബയോളജി/കമ്പ്യൂട്ടർ സയൻസ് എന്നീ 4 വിഷയങ്ങളുടെ ആകെ മാർക്ക് (600-ൽ)</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">🔬 കോർ സബ്ജക്ട് മാർക്ക് (Core Subject Mark)</label>
+                            <input type="number" id="scienceSub" placeholder="170" class="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white text-sm font-semibold focus:outline-none">
+                            <p class="text-[11px] text-slate-500 mt-1">* നിങ്ങൾ Bsc. എടുക്കാൻ ഉദ്ദേശിക്കുന്ന പ്രധാന വിഷയത്തിന്റെ മാർക്ക്(Bsc Chemistry ആണേൽ അതിന്റെ മാർക്ക്(200-ൽ)</p>
+                        </div>
+                    </div>`;
+            }
+            if(isDarkMode) { isDarkMode = !isDarkMode; toggleDarkMode(); }
+        }
+
+        function calculateAllIndex() {
+            const stream = document.getElementById('streamSelect').value;
+            const grandTotal = parseFloat(document.getElementById('grandTotal').value) || 0;
+            const englishMark = parseFloat(document.getElementById('englishMark').value) || 0;
+            const hasBonus = document.getElementById('bonusCheck').checked;
+            const hasSay = document.getElementById('sayCheck').checked;
+            const adjustments = (hasBonus ? 15 : 0) - (hasSay ? 10 : 0);
+
+            if (grandTotal === 0 || englishMark === 0) {
+                alert("ദയവായി മാർക്കുകൾ കൃത്യമായി നൽകുക.");
+                return;
+            }
+
+            let resultHTML = '';
+            let calculatedIndices = {};
+
+            if (stream === 'humanities') {
+                const subjectMark = parseFloat(document.getElementById('subjectMark').value) || 0;
+                
+                const baEnglish = grandTotal + (selectedUni === 'mg' ? englishMark * 2 : englishMark) + adjustments;
+                calculatedIndices['B.A. English Language & Literature'] = baEnglish;
+                resultHTML += createCard(`B.A. English`, baEnglish, selectedUni === 'calicut' ? 1400 : 1600, 'blue');
+                
+                const baGen = grandTotal + adjustments;
+                calculatedIndices['B.A. Economics'] = baGen;
+                calculatedIndices['B.A. History'] = baGen;
+                calculatedIndices['BA Arabic & Islamic History'] = baGen;
+                resultHTML += createCard(`B.A. General (Economics/History)`, baGen, 1200, 'emerald');
+
+                if(subjectMark > 0) {
+                    const baSpecific = grandTotal + subjectMark + adjustments;
+                    calculatedIndices['B.A. Journalism & Mass Communication'] = baSpecific;
+                    resultHTML += createCard(`B.A. Specific Subject (Journalism/Sociology)`, baSpecific, 1400, 'indigo');
+                } else {
+                    calculatedIndices['B.A. Journalism & Mass Communication'] = baGen;
+                }
+                
+            } else if (stream === 'commerce') {
+                let weightage = 0;
+                if(document.getElementById('comSub1').checked) weightage += 15;
+                if(document.getElementById('comSub2').checked) weightage += 15;
+                if(document.getElementById('comSub3').checked) weightage += 15;
+                if(selectedUni === 'mg' && weightage > 45) weightage = 50;
+
+                const bcomIdx = grandTotal + weightage + adjustments;
+                const bcaIdx = grandTotal + adjustments;
+                
+                calculatedIndices['B.Com. Finance'] = bcomIdx;
+                calculatedIndices['B.Com. Computer Application'] = bcomIdx;
+                calculatedIndices['B.Com. Co-Operation'] = bcomIdx;
+                calculatedIndices['BBA Finance (Aided)'] = bcomIdx;
+                calculatedIndices['BBA Finance (Self-Financing)'] = bcomIdx;
+                calculatedIndices['B.Sc. Computer Science'] = bcaIdx;
+                calculatedIndices['Bachelor of Computer Application (BCA)'] = bcaIdx;
+                
+                resultHTML += createCard(`B.Com / BBA (With Weightage)`, bcomIdx, 1200, 'indigo');
+                resultHTML += createCard(`BCA / B.Sc Computer Science`, bcaIdx, 1200, 'emerald');
+
+            } else if (stream === 'science') {
+                const part3Total = parseFloat(document.getElementById('part3Total').value) || 0;
+                const scienceSub = parseFloat(document.getElementById('scienceSub').value) || 0;
+
+                const bcaIdx = grandTotal + adjustments;
+                calculatedIndices['B.Sc. Computer Science'] = bcaIdx;
+                calculatedIndices['Bachelor of Computer Application (BCA)'] = bcaIdx;
+
+                if (part3Total > 0 && scienceSub > 0) {
+                    const bscIdx = selectedUni === 'calicut' ? (part3Total + scienceSub + adjustments) : Math.round(((part3Total + scienceSub) / 800) * 1000 + adjustments);
+                    
+                    calculatedIndices['B.Sc. Chemistry'] = bscIdx;
+                    calculatedIndices['B.Sc. Physics'] = bscIdx;
+                    calculatedIndices['B.Sc. Mathematics'] = bscIdx;
+                    calculatedIndices['B.Sc. Botany'] = bscIdx;
+                    calculatedIndices['B.Sc. Food Technology'] = bscIdx;
+                    
+                    resultHTML += createCard(`B.Sc. Main Subject (Physics/Chemistry/Maths)`, bscIdx, selectedUni === 'calicut' ? 800 : 1000, 'indigo');
+                } else {
+                    // Fallback to safe zero if marks aren't provided yet
+                    calculatedIndices['B.Sc. Chemistry'] = 0;
+                    calculatedIndices['B.Sc. Physics'] = 0;
+                    calculatedIndices['B.Sc. Mathematics'] = 0;
+                    calculatedIndices['B.Sc. Botany'] = 0;
+                    calculatedIndices['B.Sc. Food Technology'] = 0;
+                }
+                resultHTML += createCard(`BCA / B.Sc Computer Science`, bcaIdx, 1200, 'emerald');
+            }
+
+            document.getElementById('resultCards').innerHTML = resultHTML;
+            generateCutoffPredictions(stream, calculatedIndices);
+            document.getElementById('results').classList.remove('hidden');
+        }
+
+        function generateCutoffPredictions(stream, calculatedIndices) {
+            const courses = mesKallidiCutoffs[stream] || [];
+            let predictionsHTML = '';
+            
+            courses.forEach(c => {
+                // Fixed Fallback mapping logic to avoid wrong category indexes
+                let studentIndex = calculatedIndices[c.course];
+                if (studentIndex === undefined) {
+                    if (stream === 'humanities') studentIndex = calculatedIndices['B.A. Economics'] || 0;
+                    else if (stream === 'science') studentIndex = calculatedIndices['Bachelor of Computer Application (BCA)'] || 0;
+                    else if (stream === 'commerce') studentIndex = calculatedIndices['B.Com. Finance'] || 0;
+                }
+                
+                let chance = 'low';
+                if(studentIndex >= c.open) chance = 'high';
+                else if(studentIndex >= (c.open - 50)) chance = 'medium';
+                
+                predictionsHTML += createPredictionCard(c.course, chance, c.open, c.base);
+            });
+            
+            document.getElementById('predictionCards').innerHTML = predictionsHTML;
+        }
+
+        function createCard(title, score, base, color) {
+            const colorMap = {
+                blue: 'bg-blue-50 border-blue-200 text-blue-900',
+                indigo: 'bg-indigo-50 border-indigo-200 text-indigo-900',
+                emerald: 'bg-emerald-50 border-emerald-200 text-emerald-900'
+            };
+            return `<div class="flex justify-between items-center p-3 rounded-xl border-2 ${colorMap[color]}">
+                <span class="font-bold text-sm">${title}</span>
+                <span class="text-xl font-bold">${score} <span class="text-xs text-slate-400 font-normal">/ ${base}</span></span>
+            </div>`;
+        }
+
+        function createPredictionCard(course, chance, openCutoff, base) {
+            const config = {
+                'high': { class: 'chance-high', text: '✅ ഉയർന്ന സാധ്യത', emoji: '🎉' },
+                'medium': { class: 'chance-medium', text: '⚠️ മധ്യ സാധ്യത', emoji: '🤔' },
+                'low': { class: 'chance-low', text: '❌ കുറഞ്ഞ സാധ്യത', emoji: '😔' }
+            }[chance];
+            
+            return `<div class="p-3 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-800">
+                <div class="flex justify-between items-start">
+                    <span class="font-bold text-xs flex-1">${course}</span>
+                    <span class="${config.class} text-white text-[10px] font-bold px-2 py-0.5 rounded-full ml-2">${config.emoji}</span>
+                </div>
+                <div class="flex justify-between items-center mt-2 text-[11px]">
+                    <span class="text-slate-500">${config.text}</span>
+                    <span class="font-bold text-indigo-600">Cutoff: ${openCutoff} <span class="text-[9px] text-slate-400 font-normal">/${base}</span></span>
+                </div>
+            </div>`;
+        }
+
+        function downloadPDF() {
+            window.print();
+        }
+
+        function shareOnWhatsApp() {
+            const message = `🎓 പ്ലസ് ടു കഴിഞ്ഞവർക്ക് കോളേജ് അഡ്മിഷൻ ഇൻഡക്സ് മാർക്കും MES KALLADI കോളേജ് സാധ്യതയും അറിയാൻ ഈ ലിങ്ക് ഉപയോഗിക്കൂ:\n👉 https://chat.whatsapp.com/GQkaJ9F9wdU7Hxa5vtKDlg`;
+            window.location.href = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+        }
+
+        handleStreamChange();
+    </script>
+</body>
+</html>
